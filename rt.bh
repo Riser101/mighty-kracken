@@ -263,7 +263,7 @@ fi
 chmod -R 755 /var/www
 echo "Creating MySQL database..."
 
-mysql --user=root --password=$DB_PASS --execute="CREATE DATABASE IF NOT EXISTS \`$DOMAIN_NM$CONCAT\`; grant all on \`$DOMAIN_NM$CONCAT\`.* to 'wordpressuser'@'localhost' identified by 'password'; FLUSH PRIVILEGES;" >> $MY_LOG 2>&1
+mysql --user=root --password=$DB_PASS --execute="CREATE DATABASE IF NOT EXISTS \`$DOMAIN_NM$CONCAT\`; grant all on \`$DOMAIN_NM$CONCAT\`.* to 'wordpressuser'@'localhost' identified by '$OUTPUT'; FLUSH PRIVILEGES;" >> $MY_LOG 2>&1
 
 if [ $? -ne 0 ];
 then

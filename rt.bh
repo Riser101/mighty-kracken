@@ -98,7 +98,7 @@ if [ $? -ne 0 ];
 then
     echo "php5-fpm is not installed, now installing.."
     apt-get -y install php5-fpm >> $MY_LOG 2>&1 
-        if [$? -ne 0 ];
+        if [ $? -ne 0 ];
         then
             echo "PHP5 installation failed, check $MYLOG" 1>&2
             exit 1
@@ -149,7 +149,7 @@ if [ $? -ne 0 ];
 then
     echo "Nginx is not installed on the system, now installing.."
     apt-get -y install nginx >> $MY_LOG
-        if [$? -ne 0 ];
+        if [ $? -ne 0 ];
         then
             echo "Nginx installation failed, check log file $MY_LOG" 1>&2
             exit 1 

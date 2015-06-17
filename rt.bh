@@ -16,6 +16,7 @@ text1="${bold}------------------------------------------------------------"
 text2="This is W O R D P R E S S  Installer"
 text3="You can find log file at $out"
 text4="${bold}------------------------------------------------------------"
+OUTPUT="$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 8 | xargs)"
 
 #FUNCTION_DEFINITIONS
 
@@ -245,7 +246,7 @@ fi
 echo "Wordpress configured successfully!"
 sed -i "s/username_here/wordpressuser/" /var/www/$DOMAIN_NM/wp-config-sample.php 
 sed -i "s/database_name_here/$DOMAIN_NM$CONCAT/" /var/www/$DOMAIN_NM/wp-config-sample.php 
-sed -i "s/password_here/password/" /var/www/$DOMAIN_NM/wp-config-sample.php  
+sed -i "s/password_here/$OUTPUT/" /var/www/$DOMAIN_NM/wp-config-sample.php  
 cp /var/www/$DOMAIN_NM/wp-config-sample.php /var/www/$DOMAIN_NM/wp-config.php
 
 SALT=$(curl -s -L https://api.wordpress.org/secret-key/1.1/salt/)

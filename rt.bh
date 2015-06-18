@@ -4,7 +4,6 @@
 
 MY_LOG="`mktemp`"
 out="$(mktemp)"
-DB_PASS=""
 DOMAIN_NM=""
 ZIPPED_WP="`mktemp`.tar.gz"
 UNZIPPED_WP="`mktemp -d`"

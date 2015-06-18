@@ -4,7 +4,7 @@
 
 MY_LOG="`mktemp`"
 out="$(mktemp)"
-DB_PASS="root"
+DB_PASS=""
 DOMAIN_NM=""
 ZIPPED_WP="`mktemp`.tar.gz"
 UNZIPPED_WP="`mktemp -d`"
@@ -16,7 +16,9 @@ text1="${bold}------------------------------------------------------------"
 text2="This is W O R D P R E S S  Installer"
 text3="You can find log file at $out"
 text4="${bold}------------------------------------------------------------"
-OUTPUT="$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 8 | xargs)"
+OUTPUT1="$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 8 | xargs)"
+passdb="$(tr -dc A-Za-z0-9 < /dev/urandom | head -c 8 | xargs)" 
+
 
 #FUNCTION_DEFINITIONS
 
@@ -127,9 +129,10 @@ if [ $? -ne 0 ];
 then
     echo "MySQLserver is not installed, now installing.."
     echo ""
-    debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
-    debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
-    apt-get -y install mysql-server >>MY_LOG 2>&1
+    
+    debconf-set-selections <<< "mysql-server mysql-server/root_password password $passdb"
+    debconf-set-selections <<< "mysql-server mysql-server/root_password_again password $passdb"
+    apt-get -y install mysql-server >> MY_LOG 2>&1
         if [ $? -ne 0 ];
         then
             echo "MySQL server installation failed, check $MY_LOG" 
@@ -139,12 +142,12 @@ then
             echo "MySQL is already installed, skipping installation.."
             echo ""
             echo -n "Enter root password for database:"
-            read DB_PASS
+            read passdb
 fi
 
 echo ""
 echo "Now searching for Nginx installation.."
-dpkg-query -s nginx >>$MY_LOG 2>&1                    #checking packages for nginx
+dpkg-query -s nginx >> $MY_LOG 2>&1                    #checking packages for nginx
 
 if [ $? -ne 0 ];
 then
@@ -246,7 +249,7 @@ fi
 echo "Wordpress configured successfully!"
 sed -i "s/username_here/wordpressuser/" /var/www/$DOMAIN_NM/wp-config-sample.php 
 sed -i "s/database_name_here/$DOMAIN_NM$CONCAT/" /var/www/$DOMAIN_NM/wp-config-sample.php 
-sed -i "s/password_here/$OUTPUT/" /var/www/$DOMAIN_NM/wp-config-sample.php  
+sed -i "s/password_here/$OUTPUT1/" /var/www/$DOMAIN_NM/wp-config-sample.php  
 cp /var/www/$DOMAIN_NM/wp-config-sample.php /var/www/$DOMAIN_NM/wp-config.php
 
 SALT=$(curl -s -L https://api.wordpress.org/secret-key/1.1/salt/)
@@ -261,10 +264,11 @@ then
 fi
 
 chmod -R 755 /var/www
+
 echo "Creating MySQL database..."
 
-mysql --user=root --password=$DB_PASS --execute="CREATE DATABASE IF NOT EXISTS \`$DOMAIN_NM$CONCAT\`; grant all on \`$DOMAIN_NM$CONCAT\`.* to 'wordpressuser'@'localhost' identified by '$OUTPUT'; FLUSH PRIVILEGES;" >> $MY_LOG 2>&1
-
+        
+mysql --user=root --password=$passdb --execute="CREATE DATABASE IF NOT EXISTS \`$DOMAIN_NM$CONCAT\`; grant all on \`$DOMAIN_NM$CONCAT\`.* to 'wordpressuser'@'localhost' identified by '$OUTPUT1'; FLUSH PRIVILEGES;" >> $MY_LOG 2>&1
 if [ $? -ne 0 ];
 then
     echo "Failed to Create Database, check logfile $MY_LOG" 1>&2
